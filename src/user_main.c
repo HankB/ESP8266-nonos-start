@@ -1,5 +1,12 @@
-#include "osapi.h"
-#include "user_interface.h"
+#include <osapi.h>
+#include <user_interface.h>
+
+/* secrets.h is not included in the repo. YUou must provide it in the 
+search path and it must define
+#define SSID "MySSID"
+#define PASSWORD "MyPassword"
+*/
+#include "secrets.h"
 
 static os_timer_t p_on_timer;
 static os_timer_t p_off_timer;
@@ -75,7 +82,18 @@ void ICACHE_FLASH_ATTR user_init(void)
     os_printf("SDK version:%s\n", system_get_sdk_version());
 
     // Disable WiFi
-    	wifi_set_opmode(NULL_MODE);
+    //wifi_set_opmode(NULL_MODE);
+    wifi_set_opmode(STATION_MODE);
+    wifi_station_set_hostname("esp8266.1");
+    static char ssid[32] = SSID;
+    static char password[64] = PASSWORD;
+    static struct station_config stationConf;
+
+    stationConf.bssid_set = 0;
+    os_memcpy(&stationConf.ssid, ssid, 32);
+    os_memcpy(&stationConf.password, password, 64);
+
+    wifi_station_set_config(&stationConf);
 
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
 
